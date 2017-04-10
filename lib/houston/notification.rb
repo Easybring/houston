@@ -89,7 +89,7 @@ module Houston
     end
 
     def valid?
-      parse_json(payload).bytesize <= MAXIMUM_PAYLOAD_SIZE
+      MultiJson.dump(payload).bytesize <= MAXIMUM_PAYLOAD_SIZE
     end
 
     def error
@@ -97,17 +97,12 @@ module Houston
     end
 
     private
-
-      def parse_json payload
-        defined?(ActiveSupport::JSON) ? MultiJson.dump(payload) : payload.to_json
-      end
-    
       def device_token_item
         [1, 32, @token.gsub(/[<\s>]/, '')].pack('cnH64')
       end
 
       def payload_item
-        json = parse_json(payload)
+        json = MultiJson.dump(payload)
         [2, json.bytes.count, json].pack('cna*')
       end
 
